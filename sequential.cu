@@ -1,68 +1,102 @@
-
-#include "cuda_runtime.h"
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
+#include <string>
 #include <stdio.h>
-#include <cstring>
-#include "device_launch_parameters.h"
+#include <stdlib.h>
+#include <time.h>
 
-__global__ void logic_gate(int gate1, int gate2, int op) {
-    /*
-    while () {
-        // Call the logic_gate function
-        int gate1 = data[0] - '0';
-        int gate2 = data[2] - '0';
-        int op = data[4] - '0';
-        logic_gate << <1, 1 >> > (gate1, gate2, op);
+#define AND 0
+#define OR 1
+#define NAND 2
+#define NOR 3
+#define XOR 4
+#define NXOR 5
 
-    }*/
+void getOperands(char* line, int* operands) {
+
+    /* get operands */
+    operands[0] = atoi(line);
+    operands[1] = atoi(line+2);
+    operands[2] = atoi(line+4);
+    printf("op1: %d, op2: %d, op3: %d\n", operands[0], operands[1], operands[2]);
+
 }
 
+char get_LogicGate_Output(int ops[]) {
 
-int process(char* input_filename, int file_length, char* output_filename) {
+    char output;
+    int result;
 
-    // Allocate space for the data
-    char** data = (char**) malloc(file_length * sizeof(char*));
+    switch (ops[2]) {
 
-    FILE* input = fopen(input_filename, "r");
-    FILE* output = fopen(output_filename, "w");
-
-    for (int i = 0; i < file_length; i++) {
-        data[i] = (char*)malloc(16);
-        fgets(data[i], sizeof(16), input);
+    case AND:
+        result = ops[0] & ops[1];
+        break;
+    case OR:
+        result = ops[0] | ops[1];
+        break;
+    case NAND:
+        result = !(ops[0] & ops[1]);
+        break;
+    case NOR:
+        result = !(ops[0] | ops[1]);
+        break;
+    case XOR:
+        result = ops[0] ^ ops[1];
+        break;
+    case NXOR:
+        result = !(ops[0] ^ ops[1]);
+        break;
     }
-   
-    for (int i = 0; i < file_length; i++) {
-        free(data[i]);
-    }
-    free(data);
 
+    output = result + '0';
+    return output;
 
-    fclose(input);
-    fclose(output);
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    if (argc == 4) {
-        // User should pass absolute file paths
-        char* input_filename = argv[1];
-        int file_length = atoi(argv[2]);
-        char* output_filename = argv[3];
-
-        int error = process(input_filename, file_length, output_filename);
-
-        if (error != 0) {
-            printf("Error %d \n", error);
-
-        }
-        else {
-            printf("Success .\n");
-        }
-    }
-    else {
-        printf("Expected three arguments : input_filename file_length output_filename \n");
-    }
-    return 0;
-}
+//int main(int argc, char* argv[]) {
+//    FILE* inputFile;
+//    FILE* outputFile;
+//    char line[100];
+//    int len = 6;
+//    int operands[3] = { 0 };
+//    char output = 'a';
+//
+//    if (argc != 4) {
+//        printf("Error: Please enter the input file path, input file length and output file path when running.\n");
+//        return 1;
+//    }
+//
+//    char* input_fileName = argv[1];
+//    int inputLength = atoi(argv[2]);
+//    char* output_fileName = argv[3];
+//
+//    inputFile = fopen(input_fileName, "r");
+//    outputFile = fopen(output_fileName, "w");
+//
+//    if (inputFile == NULL) {
+//        fprintf(stderr, "Error opening file.\n");
+//        return 1;
+//    }
+//
+//    clock_t start = clock();
+//    printf("%s\n", input_fileName);
+//    printf("%s\n", fgets(line, len, inputFile));
+//    while (fgets(line, 100, inputFile)) {
+//        printf("%s\n", line);
+//        getOperands(line, operands);
+//        output = get_LogicGate_Output(operands);
+//        fprintf(outputFile, "%c\n", output);
+//
+//    }
+//    clock_t end = clock();
+//    int time_spent = ((end - start) * 1000) / CLOCKS_PER_SEC;
+//
+//
+//    //free(line);
+//    fclose(outputFile);
+//    fclose(inputFile);
+//
+//    printf("Success!, Time: %ds %dms\n", time_spent / 1000, time_spent % 1000);
+//
+//    return 0;
+//
+//}
